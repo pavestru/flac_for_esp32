@@ -33,12 +33,10 @@
 #ifndef FLAC__PRIVATE__BITMATH_H
 #define FLAC__PRIVATE__BITMATH_H
 
-#include <pgmspace.h>
+#include "FLAC/ordinals.h"
+#include "FLAC/assert.h"
 
-#include "../FLAC/ordinals.h"
-#include "../FLAC/assert.h"
-
-#include "../share/compat.h"
+#include "share/compat.h"
 
 #if defined(_MSC_VER)
 #include <intrin.h> /* for _BitScanReverse* */
@@ -47,7 +45,7 @@
 /* Will never be emitted for MSVC, GCC, Intel compilers */
 static inline unsigned int FLAC__clz_soft_uint32(FLAC__uint32 word)
 {
-	static const unsigned char byte_to_unary_table[] PROGMEM = {
+	static const unsigned char byte_to_unary_table[] = {
 	8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -66,10 +64,10 @@ static inline unsigned int FLAC__clz_soft_uint32(FLAC__uint32 word)
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	};
 
-	return word > 0xffffff ? pgm_read_byte(&byte_to_unary_table[word >> 24]) :
-		word > 0xffff ? pgm_read_byte(&byte_to_unary_table[word >> 16]) + 8 :
-		word > 0xff ? pgm_read_byte(&byte_to_unary_table[word >> 8]) + 16 :
-		pgm_read_byte(&byte_to_unary_table[word]) + 24;
+	return word > 0xffffff ? byte_to_unary_table[word >> 24] :
+		word > 0xffff ? byte_to_unary_table[word >> 16] + 8 :
+		word > 0xff ? byte_to_unary_table[word >> 8] + 16 :
+		byte_to_unary_table[word] + 24;
 }
 
 static inline unsigned int FLAC__clz_uint32(FLAC__uint32 v)
