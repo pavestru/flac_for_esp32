@@ -30,7 +30,8 @@ static FLAC__int32 pcm[READSIZE/*samples*/ * CHANNELS];
 int num_samples_encoded = 0;
 int total = 0;
 int frames = 0;
-int  total_samples = 0;
+int total_samples = 0;
+size_t total_bytes_compressed = 0;
 
 struct timeval tvalBefore, tvalFirstFrame, tvalAfter;
 
@@ -131,6 +132,8 @@ void flac_test()
 
 	printf("Total frames: %d TotalBytes: %d\n", frames, 2 * total);
 
+	printf("Average compression rate (compressed / raw): %d/%d (%d%%)\n", total_bytes_compressed, total*2, 100*total_bytes_compressed/(total*2));
+
 	while (1)
 		vTaskDelay(500 / portTICK_RATE_MS);
 
@@ -148,6 +151,7 @@ FLAC__StreamEncoderWriteStatus write_callback(const FLAC__StreamEncoder *encoder
 			gettimeofday(&tvalFirstFrame, NULL);
 
 		total += samples;
+		total_bytes_compressed += bytes;
 		frames = current_frame;
 		fprintf(stderr, "encoded %d samples in %d byte frame, total %d/%u samples, %u frames\n", samples, bytes, total, total_samples, current_frame);
 		gettimeofday(&tvalAfter, NULL);
